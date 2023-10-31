@@ -9,13 +9,19 @@
 using namespace std;
 
 
-struct Mark {
-    int h = 0;
-    int l = 0;
-    int msl = 0;
-};
+
 template<class T>
 struct Node {
+
+    struct Mark {
+        int h = 0;
+        int l = 0;
+        int msl = 0;
+
+        Node* mPrev = nullptr;
+        Node* m = nullptr;
+    };
+
     T* element = nullptr;
 
     Node* left = nullptr;
@@ -107,8 +113,10 @@ void goReverse(Node<T>* n) {
             n->mark.l = 1;
             n->mark.h = 0;
             n->mark.msl = 0;
+            n->mark.m = n;
         }
         else {
+            // h >= 1;
             if (n->hasBoth()) {
                 n->mark.h = max(n->right->mark.h, n->left->mark.h) + 1;
                 n->mark.msl += n->right->mark.h + n->left->mark.msl + 2;
@@ -119,19 +127,46 @@ void goReverse(Node<T>* n) {
                         n->mark.l = n->right->mark.l;
                     else
                         n->mark.l = n->left->mark.l;
+
+
+                // do
             }
             else {
                 if (n->hasLeft()) {
                     n->mark.l = n->left->mark.l;
                     n->mark.h = n->left->mark.h + 1;
+
+                    
                 }
                 else {
                     n->mark.l = n->right->mark.l;
                     n->mark.h = n->right->mark.h + 1;
+
                 }
 
                 n->mark.msl = n->mark.h;
             }
+
+             {
+                if (n->hasLeft()) {
+                    if (n->mark.h == 1)
+                        n->mark.m = n->left->mark.m;
+                }
+                else {
+                    if (n->mark.h == 1)
+                        n->mark.m = n;
+                }
+
+                n->mark.mPrev = n;
+            }
+
+            /*if (n->hasLeft()) {
+                n->mark.m = n->left->mark.m;
+                n->mark.mPrev = n->left->mark.mPrev;
+            } else {
+                n->mark.m = n->right->mark.m;
+                n->mark.mPrev = n->right->mark.mPrev;
+            }*/
         }
 
         
