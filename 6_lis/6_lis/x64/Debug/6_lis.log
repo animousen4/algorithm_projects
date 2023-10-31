@@ -1,3 +1,0 @@
-﻿  6_lis.cpp
-D:\_UNIVERSITY\algorithm\CPP\6_lis\6_lis\6_lis.cpp(11,21): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
-  6_lis.vcxproj -> D:\_UNIVERSITY\algorithm\CPP\6_lis\x64\Debug\6_lis.exe

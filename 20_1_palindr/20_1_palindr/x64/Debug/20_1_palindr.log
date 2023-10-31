@@ -1,3 +1,0 @@
-﻿  20_1_palindr.cpp
-D:\_UNIVERSITY\algorithm\CPP\20_1_palindr\20_1_palindr\20_1_palindr.cpp(25,29): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-  20_1_palindr.vcxproj -> D:\_UNIVERSITY\algorithm\CPP\20_1_palindr\x64\Debug\20_1_palindr.exe
