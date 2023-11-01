@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-
+#include <vector>
 using namespace std;
 
 
@@ -67,7 +67,13 @@ struct Node {
     }
 
 };
+template<class T>
+struct Way {
+    Node<T>* s = nullptr;
+    Node<T>* f = nullptr;
+    vector<Node<T>*> elements;
 
+};
 template<class T>
 class Tree {
 public:
@@ -75,6 +81,7 @@ public:
         root = new Node<T>;
     }
     Node<T>* root;
+    vector<Node<T>*> maxMSLLinks;
 
     friend istream& operator >> (istream& in, Tree& tree) {
         T element;
@@ -86,6 +93,7 @@ public:
 };
 
 ofstream outputFile;
+
 int elementAmount = 0;
 int curElement = 0;
 template<class T>
@@ -103,12 +111,14 @@ void goForward(Node<T>* n) {
 
 
 template<class T>
-void goReverse(Node<T>* n) {
+void goReverse(Node<T>* n, vector<Node<T>*>& maxMSLLinks) {
+    
+
     if (n != nullptr) {
-        
-        goReverse(n->left);
-        goReverse(n->right);
-        
+
+        goReverse<T>(n->left, maxMSLLinks);
+        goReverse<T>(n->right, maxMSLLinks);
+
         if (n->isLeaf()) {
             n->mark.l = 1;
             n->mark.h = 0;
@@ -147,33 +157,66 @@ void goReverse(Node<T>* n) {
                 n->mark.msl = n->mark.h;
             }
 
-             {
-                if (n->hasLeft()) {
-                    if (n->mark.h == 1)
-                        n->mark.m = n->left->mark.m;
+        }            
+         
+        if (maxMSLLinks.size() > 0) {
+            if (maxMSLLinks[0]->mark.msl < n->mark.msl) {
+                maxMSLLinks.clear();
+                maxMSLLinks.push_back(n);
+            } else
+                if (maxMSLLinks[0]->mark.msl == n->mark.msl) {
+                    maxMSLLinks.push_back(n);
                 }
-                else {
-                    if (n->mark.h == 1)
-                        n->mark.m = n;
-                }
-
-                n->mark.mPrev = n;
-            }
-
-            /*if (n->hasLeft()) {
-                n->mark.m = n->left->mark.m;
-                n->mark.mPrev = n->left->mark.mPrev;
-            } else {
-                n->mark.m = n->right->mark.m;
-                n->mark.mPrev = n->right->mark.mPrev;
-            }*/
+                
+            
         }
-
-        
-                        
-          
+        else {
+            maxMSLLinks.push_back(n);
+        }
     }
 }
+
+template<class T>
+void goForwardG(Node<T>* n, Way<T>& curWay) {
+    // n != nullptr
+
+    curWay.elements.push_back(n);
+
+    if (n->hasLeft() && n->left->mark.h == n->mark.h - 1)
+        goForwardG(n->left, curWay);
+    else
+        if (n->hasRight())
+            goForwardG(n->right, curWay);
+        else
+            curWay.f = n;
+}
+
+template<class T>
+void search(Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
+
+    // root
+
+    if (maxMSLLinks[maxMSLLinks.size() - 1] == root) {
+        Way<T> way;
+        way.s = root;
+
+        goForwardG(root, way);
+
+        cout << "S: " << *way.s->element << "\nF: " << *way.f->element << "\n";
+        for (Node<T>* el : way.elements) {
+            cout << *el->element << " ";
+        }
+        // root wins;
+
+    }
+
+    /*for (auto el : maxMSLLinks) {
+        cout << el->mark.msl << " ";
+    }*/
+
+
+}
+
 
 int main()
 {
@@ -187,11 +230,11 @@ int main()
 
     outputFile.open("output.txt");
 
-    goReverse(tree.root);
+    goReverse(tree.root, tree.maxMSLLinks);
+
+    search(tree.root, tree.maxMSLLinks);
 
     goForward(tree.root);
-
-    cout << tree.root->right->mark.msl;
 
     inputFile.close();
     outputFile.close();
