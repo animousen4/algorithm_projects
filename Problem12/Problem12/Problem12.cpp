@@ -45,6 +45,8 @@ struct Node {
         return !hasLeft() && !hasRight();
     }
 
+
+
     void pushElement(T el) {
         if (element == nullptr) {
             element = new T(el);
