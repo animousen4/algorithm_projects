@@ -45,6 +45,22 @@ struct Node {
         return !hasLeft() && !hasRight();
     }
 
+    Node* getPriorityChild() {
+        // only if has at least 1 child
+        if (hasBoth()) {
+            if (left->mark.h >= right->mark.h)
+                return left;
+            else
+                return right;
+        }
+        else {
+            if (hasLeft()) {
+                return left;
+            } else {
+                return right;
+            }
+        }
+    }
 
 
     void pushElement(T el) {
@@ -69,12 +85,26 @@ struct Node {
     }
 
 };
-template<class T>
-struct Way {
-    Node<T>* s = nullptr;
-    Node<T>* f = nullptr;
-    vector<Node<T>*> elements;
+template<class T> struct PointPair
+{
+    Node<T>* a;
+    Node<T>* b;
 
+    Node<T>* localRoot;
+    //static PointPair& minRoot(PointPair& p1, PointPair& p2) {
+    //    
+    //}
+    T getSum() {
+        return *a->element + *b->element;
+    }
+
+    bool operator<(PointPair<T>& o2) {
+        return getSum() < o2.getSum();
+    }
+
+    bool operator==(PointPair<T>& o2) {
+        return getSum() == o2.getSum();
+    }
 };
 template<class T>
 class Tree {
@@ -159,6 +189,18 @@ void goReverse(Node<T>* n, vector<Node<T>*>& maxMSLLinks) {
                 n->mark.msl = n->mark.h;
             }
 
+
+            auto pC = n->getPriorityChild();
+
+            if (n->mark.h == 1) {
+                n->mark.m = pC->mark.m;
+                n->mark.mPrev = n;
+            }
+            else {
+                n->mark.m = pC->mark.m;
+                n->mark.mPrev = pC->mark.mPrev;
+            }
+
         }            
          
         if (maxMSLLinks.size() > 0) {
@@ -178,44 +220,85 @@ void goReverse(Node<T>* n, vector<Node<T>*>& maxMSLLinks) {
     }
 }
 
-template<class T>
-void goForwardG(Node<T>* n, Way<T>& curWay) {
-    // n != nullptr
-
-    curWay.elements.push_back(n);
-
-    if (n->hasLeft() && n->left->mark.h == n->mark.h - 1)
-        goForwardG(n->left, curWay);
-    else
-        if (n->hasRight())
-            goForwardG(n->right, curWay);
-        else
-            curWay.f = n;
-}
+//template<class T>
+//void goForwardG(Node<T>* n, Way<T>& curWay) {
+//    // n != nullptr
+//
+//    curWay.elements.push_back(n);
+//
+//    if (n->hasLeft() && n->left->mark.h == n->mark.h - 1)
+//        goForwardG(n->left, curWay);
+//    else
+//        if (n->hasRight())
+//            goForwardG(n->right, curWay);
+//        else
+//            curWay.endElements.push_back(n);
+//}
 
 template<class T>
 void search(Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
 
-    // root
+    //cout << *root->mark.m->element << " " << *root->mark.mPrev->element;
 
-    if (maxMSLLinks[maxMSLLinks.size() - 1] == root) {
-        Way<T> way;
-        way.s = root;
+    if (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl) {
+        cout << *root->element << " <-> " << *root->mark.m->element;
+        return;
+    } else
+        if (root->mark.msl + 1 == maxMSLLinks[0]->mark.msl) {
+            maxMSLLinks.push_back(root);
 
-        goForwardG(root, way);
+        int undefCount = 0;
+        Node<T>* node = maxMSLLinks[0];
+        PointPair<T> minPair = PointPair<T>{ node->left->mark.m, node->right->mark.mPrev, node};
+        PointPair<T> p{ node->left->mark.mPrev, node->right->mark.m, node};
 
-        cout << "S: " << *way.s->element << "\nF: " << *way.f->element << "\n";
-        for (Node<T>* el : way.elements) {
-            cout << *el->element << " ";
+        if (p < minPair)
+            minPair = p;
+        else
+            if (minPair == p)
+                if (*p.localRoot->element == *minPair.localRoot->element)
+                    undefCount++;
+        
+        for (int i = 1; i < maxMSLLinks.size(); i++) {
+            Node<T>* node = maxMSLLinks[i];
+
+            {
+
+                PointPair<T> p1{ node->left->mark.m, node->right->mark.mPrev, node};
+                
+
+                if (p1 < minPair) {
+                    minPair = p1;
+                    undefCount = 0;
+                }
+                else
+                    if (p1 == minPair) {
+                        if (*p1.localRoot->element == *minPair.localRoot->element )
+                            undefCount++;
+                    }
+
+                PointPair<T> p2{ node->left->mark.mPrev, node->right->mark.m, node };
+
+                if (p2 < minPair) {
+                    minPair = p2;
+                    undefCount = 0;
+                }
+                else
+                    if (p2 == minPair) {
+                        if (*p2.localRoot->element == *minPair.localRoot->element)
+                            undefCount++;
+                    }
+                /*cout << "[" << *node->left->mark.m->element << "<->" << *node->right->mark.mPrev->element << "]" << endl;
+                cout << "[" << *node->left->mark.mPrev->element << "<->" << *node->right->mark.m->element << "]" << endl;*/
+            }
         }
-        // root wins;
-
+        if (undefCount > 0) {
+            cout << "UNDEFINED, NOTHING TO DO";
+        }
+        else {
+            cout << *minPair.a->element << "<->" << *minPair.b->element;
+        }
     }
-
-    /*for (auto el : maxMSLLinks) {
-        cout << el->mark.msl << " ";
-    }*/
-
 
 }
 
