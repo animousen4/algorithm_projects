@@ -243,61 +243,61 @@ void search(Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
     if (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl) {
         cout << *root->element << " <-> " << *root->mark.m->element;
         return;
-    } else
-        if (root->mark.msl + 1 == maxMSLLinks[0]->mark.msl) {
-            maxMSLLinks.push_back(root);
+    } 
 
-        int undefCount = 0;
-        Node<T>* node = maxMSLLinks[0];
-        PointPair<T> minPair = PointPair<T>{ node->left->mark.m, node->right->mark.mPrev, node};
-        PointPair<T> p{ node->left->mark.mPrev, node->right->mark.m, node};
+    int undefCount = 0;
+    Node<T>* node = maxMSLLinks[0];
+    PointPair<T> minPair = PointPair<T>{ node->left->mark.m, node->right->mark.mPrev, node};
+    PointPair<T> p{ node->left->mark.mPrev, node->right->mark.m, node};
 
-        if (p < minPair)
-            minPair = p;
-        else
-            if (minPair == p)
-                if (*p.localRoot->element == *minPair.localRoot->element)
-                    undefCount++;
+    if (p < minPair)
+        minPair = p;
+    else
+        if (minPair == p)
+            if (*p.localRoot->element == *minPair.localRoot->element)
+                undefCount++;
         
-        for (int i = 1; i < maxMSLLinks.size(); i++) {
-            Node<T>* node = maxMSLLinks[i];
+    for (int i = 1; i < maxMSLLinks.size(); i++) {
+        Node<T>* node = maxMSLLinks[i];
+        if (node->hasBoth()) {
 
-            {
-
-                PointPair<T> p1{ node->left->mark.m, node->right->mark.mPrev, node};
+            PointPair<T> p1{ node->left->mark.m, node->right->mark.mPrev, node};
                 
 
-                if (p1 < minPair) {
-                    minPair = p1;
-                    undefCount = 0;
-                }
-                else
-                    if (p1 == minPair) {
-                        if (*p1.localRoot->element == *minPair.localRoot->element )
-                            undefCount++;
-                    }
-
-                PointPair<T> p2{ node->left->mark.mPrev, node->right->mark.m, node };
-
-                if (p2 < minPair) {
-                    minPair = p2;
-                    undefCount = 0;
-                }
-                else
-                    if (p2 == minPair) {
-                        if (*p2.localRoot->element == *minPair.localRoot->element)
-                            undefCount++;
-                    }
-                /*cout << "[" << *node->left->mark.m->element << "<->" << *node->right->mark.mPrev->element << "]" << endl;
-                cout << "[" << *node->left->mark.mPrev->element << "<->" << *node->right->mark.m->element << "]" << endl;*/
+            if (p1 < minPair) {
+                minPair = p1;
+                undefCount = 0;
             }
+            else
+                if (p1 == minPair) {
+                    if (*p1.localRoot->element == *minPair.localRoot->element )
+                        undefCount++;
+                }
+
+            PointPair<T> p2{ node->left->mark.mPrev, node->right->mark.m, node };
+
+            if (p2 < minPair) {
+                minPair = p2;
+                undefCount = 0;
+            }
+            else
+                if (p2 == minPair) {
+                    if (*p2.localRoot->element == *minPair.localRoot->element)
+                        undefCount++;
+                }
+            /*cout << "[" << *node->left->mark.m->element << "<->" << *node->right->mark.mPrev->element << "]" << endl;
+            cout << "[" << *node->left->mark.mPrev->element << "<->" << *node->right->mark.m->element << "]" << endl;*/
         }
-        if (undefCount > 0) {
-            cout << "UNDEFINED, NOTHING TO DO";
-        }
-        else {
-            cout << *minPair.a->element << "<->" << *minPair.b->element;
-        }
+    }
+
+    if (root->mark.msl + 1 == maxMSLLinks[0]->mark.msl) {
+        // !!!!!
+    }
+    if (undefCount > 0) {
+        cout << "UNDEFINED, NOTHING TO DO";
+    }
+    else {
+        cout << *minPair.a->element << "<->" << *minPair.b->element;
     }
 
 }
