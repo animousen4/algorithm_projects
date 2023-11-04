@@ -6,6 +6,7 @@
 #include <fstream>
 #include <algorithm>
 #include <vector>
+#include <queue>
 using namespace std;
 
 
@@ -340,16 +341,28 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
 
     //cout << *root->mark.m->element << " " << *root->mark.mPrev->element;
 
-    if (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl) {
+    /*if (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl) {
         cout << *root->element << " <-> " << *root->mark.m->element;
         return;
-    } 
+    }  */
+    //priority_queue<PointPa> queue;
+
+    TreeManipulator<T> tm;
+    if (((root->hasLeft() || root->hasRight()) && !root->hasBoth()) && (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl)) {
+        cout << *root->element << " <-> " << *root->mark.m->element;
+        int t = (root->mark.msl + 1) / 2;
+        goForwardG(tree, root->getPriorityChild(), t);
+
+        tm.goForwardPrint(tree.root);
+        return;
+    }
 
     int undefCount = 0;
     Node<T>* node = maxMSLLinks[0];
     PointPair<T> minPair = PointPair<T>{ node->left->mark.m, node->right->mark.mPrev, node};
     PointPair<T> p{ node->left->mark.mPrev, node->right->mark.m, node};
 
+    
     if (p < minPair)
         minPair = p;
     else
@@ -414,7 +427,7 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
             }
                 
     }
-    TreeManipulator<T> tm;
+    
 
     if (undefCount > 0) {
         cout << "UNDEFINED, NOTHING TO DO";
@@ -426,6 +439,9 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
             ((minPair.localRoot->mark.msl - 1) % 2 == 0)) {
             int target = (minPair.localRoot->mark.msl + 1) / 2;
 
+            /*if (minPair.localRoot == root) {
+                tm.removeElement(tree, *root->element);
+            }*/
             if (minPair.localRoot->hasLeft()) {
                 goForwardG(tree, minPair.localRoot->left, target);
             }
