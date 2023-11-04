@@ -320,7 +320,7 @@ void goForwardG(Tree<T>& tree, Node<T>* n, int& targetAmount) {
     
     if (n != nullptr) {
         if (n->mark.h == targetAmount) {
-            cout << "TARGET: " << *n->element << endl;
+            cout << "\nTARGET: " << *n->element << endl;
             TreeManipulator<T> tm;
             tm.removeElement(tree, *n->element);
             cout << "Remove finished " << endl;
@@ -422,12 +422,8 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
     else {
         cout << *minPair.a->element << "<->" << *minPair.b->element;
 
-        if ((minPair.localRoot->mark.msl + 1) / 2 == minPair.localRoot->mark.h) {
-            // delete localRoot
-            tm.removeElement(tree, *minPair.localRoot->element);
-        }
-        else
-        if ((minPair.localRoot->mark.msl - 1) % 2 == 0) {
+        if (minPair.localRoot == root ? ((minPair.localRoot->mark.msl) % 2 == 0) :
+            ((minPair.localRoot->mark.msl - 1) % 2 == 0)) {
             int target = (minPair.localRoot->mark.msl + 1) / 2;
 
             if (minPair.localRoot->hasLeft()) {
