@@ -345,70 +345,53 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
         cout << *root->element << " <-> " << *root->mark.m->element;
         return;
     }  */
-    //priority_queue<PointPa> queue;
 
+    
+    
     TreeManipulator<T> tm;
-    if (((root->hasLeft() || root->hasRight()) && !root->hasBoth()) && (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl)) {
-        cout << *root->element << " <-> " << *root->mark.m->element;
+    if (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl) {
+        cout << *root->mark.m->element << " <-> " << *root->element;
         int t = (root->mark.msl + 1) / 2;
+
         goForwardG(tree, root->getPriorityChild(), t);
 
-        tm.goForwardPrint(tree.root);
         return;
     }
 
-    int undefCount = 0;
-    Node<T>* node = maxMSLLinks[0];
-    PointPair<T> minPair = PointPair<T>{ node->left->mark.m, node->right->mark.mPrev, node};
-    PointPair<T> p{ node->left->mark.mPrev, node->right->mark.m, node};
-
-    
-    if (p < minPair)
-        minPair = p;
-    else
-        if (minPair == p)
-            if (*p.localRoot->element == *minPair.localRoot->element)
-                undefCount++;
-            else if (*p.localRoot->element < *minPair.localRoot->element) {
-                minPair = p;
-            }
-        
-    for (int i = 1; i < maxMSLLinks.size(); i++) {
-        Node<T>* node = maxMSLLinks[i];
-        if (node->hasBoth()) {
-
-            PointPair<T> p1{ node->left->mark.m, node->right->mark.mPrev, node};
-                
-
-            if (p1 < minPair) {
-                minPair = p1;
-                undefCount = 0;
-            }
-            else
-                if (p1 == minPair) {
-                    if (*p1.localRoot->element == *minPair.localRoot->element )
-                        undefCount++;
-                    else if (*p1.localRoot->element < *minPair.localRoot->element) {
-                        minPair = p1;
-                    }
-                }
-
-            PointPair<T> p2{ node->left->mark.mPrev, node->right->mark.m, node };
-
-            if (p2 < minPair) {
-                minPair = p2;
-                undefCount = 0;
-            }
-            else
-                if (p2 == minPair) {
-                    if (*p2.localRoot->element == *minPair.localRoot->element)
-                        undefCount++;
-                    else if (*p2.localRoot->element < *minPair.localRoot->element) {
-                        minPair = p2;
-                    }
-                }
-
+    vector<PointPair<T>> comparable;
+    Node<T>* node;
+    for (int i = 0; i < maxMSLLinks.size(); i++) {
+        node = maxMSLLinks[i];
+        if (node->left->mark.m != nullptr && node->right->mark.mPrev != nullptr) {
+            comparable.push_back(PointPair<T> {node->left->mark.m, node->right->mark.mPrev, node});
         }
+
+        if (node->left->mark.mPrev != nullptr && node->right->mark.m != nullptr) {
+            comparable.push_back(PointPair<T> {node->left->mark.mPrev, node->right->mark.m, node});
+        }
+    }
+
+    int undefCount = 0;
+    
+    
+    PointPair<T> minPair = comparable[0];
+    PointPair<T> cur;
+
+    for (int i = 1; i < comparable.size(); i++) {
+        cur = comparable[i];
+
+        if (cur < minPair) {
+            minPair = cur;
+            undefCount = 0;
+        }
+        else
+            if (cur == minPair) {
+                if (*cur.localRoot->element == *minPair.localRoot->element )
+                    undefCount++;
+                else if (*cur.localRoot->element < *minPair.localRoot->element) {
+                    minPair = cur;
+                }
+            }
     }
 
     if (root->mark.msl + 1 == minPair.localRoot->mark.msl) {
@@ -435,13 +418,9 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
     else {
         cout << *minPair.a->element << "<->" << *minPair.b->element;
 
-        if (minPair.localRoot == root ? ((minPair.localRoot->mark.msl) % 2 == 0) :
-            ((minPair.localRoot->mark.msl - 1) % 2 == 0)) {
+        
             int target = (minPair.localRoot->mark.msl + 1) / 2;
 
-            /*if (minPair.localRoot == root) {
-                tm.removeElement(tree, *root->element);
-            }*/
             if (minPair.localRoot->hasLeft()) {
                 goForwardG(tree, minPair.localRoot->left, target);
             }
@@ -449,7 +428,7 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
             if (minPair.localRoot->hasRight()) {
                 goForwardG(tree, minPair.localRoot->right, target);
             }
-        }
+       
 
     }
 
