@@ -123,28 +123,118 @@ public:
     }
 
 };
-
 template<class T>
 struct NodeChain {
-    Node<T>* parent;
     Node<T>* n;
+    Node<T>* parent;
+    bool l = 1;
 };
 ofstream outputFile;
 
-int elementAmount = 0;
-int curElement = 0;
 template<class T>
-void goForward(Node<T>* n) {
-    if (n != nullptr) {
-        curElement++;
-        outputFile << *n->element;
-        if (curElement != elementAmount) {
-            outputFile << "\n";
+class TreeManipulator {
+public:
+    void goForwardPrint(Node<T>* n) {
+        if (n != nullptr) {
+            outputFile << *n->element << "\n";
+            goForwardPrint(n->left);
+            goForwardPrint(n->right);
         }
-        goForward(n->left);
-        goForward(n->right);
+
     }
-}
+    NodeChain<T> getMinNode(NodeChain<T> n) {
+
+        if (n.n->left == nullptr)
+            return n;
+
+        return getMinNode({ n.n->left, n.n });
+
+    }
+
+    T ejectMin(Node<T>* n) {
+        T v;
+        NodeChain<T> nodeChain = getMinNode({ n->right, n, 0 });
+        v = *nodeChain.n->element;
+
+        removeElement(nodeChain);
+
+        return v;
+    }
+
+    void removeElement(NodeChain<T> nodeChain) {
+        if (nodeChain.n->isLeaf())
+            if (nodeChain.l) {
+                delete nodeChain.parent->left;
+                nodeChain.parent->left = nullptr;
+            }
+            else {
+                delete nodeChain.parent->right;
+                nodeChain.parent->right = nullptr;
+            }
+        else if (nodeChain.n->hasLeft() && !nodeChain.n->hasRight()) {
+            if (nodeChain.l) {
+                nodeChain.parent->left = nodeChain.n->left;
+            }
+            else {
+                nodeChain.parent->right = nodeChain.n->left;
+            }
+
+            delete nodeChain.n;
+        }
+        else if (!nodeChain.n->hasLeft() && nodeChain.n->hasRight()) {
+            if (nodeChain.l) {
+                nodeChain.parent->left = nodeChain.n->right;
+            }
+            else {
+                nodeChain.parent->right = nodeChain.n->right;
+            }
+
+            delete nodeChain.n;
+        }
+        else {
+            int v = ejectMin(nodeChain.n);
+            *nodeChain.n->element = v;
+        }
+    }
+    void removeElement(Node<T>* n, Node<T>* parent, bool l, T value) {
+        if (n == nullptr)
+            return;
+
+        if (*n->element == value) {
+            removeElement({ n, parent, l });
+        }
+        else {
+            removeElement(n->left, n, 1, value);
+            removeElement(n->right, n, 0, value);
+        }
+
+    }
+
+    void removeElement(Tree<T>& tree, T value) {
+        if (value == *tree.root->element) {
+            if (tree.root->right != nullptr) {
+                if (tree.root->left == nullptr) {
+                    tree.root = tree.root->right;
+                }
+                else {
+                    int min = ejectMin(tree.root);
+                    *tree.root->element = min;
+                }
+
+            }
+            else
+                if (tree.root->left != nullptr) {
+                    tree.root = tree.root->left;
+                }
+                else
+                    tree.root = nullptr;
+
+        }
+        else
+            removeElement(tree.root, nullptr, 0, value);
+    }
+
+};
 
 
 template<class T>
@@ -226,22 +316,27 @@ void goReverse(Node<T>* n, vector<Node<T>*>& maxMSLLinks) {
 }
 
 template<class T>
-void goForwardG(Node<T>* n, int& targetAmount) {
+void goForwardG(Tree<T>& tree, Node<T>* n, int& targetAmount) {
     
     if (n != nullptr) {
-        if (n->mark.msl == targetAmount) {
+        if (n->mark.h == targetAmount) {
+            cout << "TARGET: " << *n->element << endl;
+            TreeManipulator<T> tm;
+            tm.removeElement(tree, *n->element);
+            cout << "Remove finished " << endl;
             return;
         }
 
         if (n->hasLeft() || n->hasRight()) {
-            // !!!!
-            n->getPriorityChild();
+            
+            auto c = n->getPriorityChild();
+            goForwardG(tree, c, targetAmount);
         }
     }
 }
 
 template<class T>
-void search(Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
+void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
 
     //cout << *root->mark.m->element << " " << *root->mark.mPrev->element;
 
@@ -299,8 +394,7 @@ void search(Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
                         minPair = p2;
                     }
                 }
-            /*cout << "[" << *node->left->mark.m->element << "<->" << *node->right->mark.mPrev->element << "]" << endl;
-            cout << "[" << *node->left->mark.mPrev->element << "<->" << *node->right->mark.m->element << "]" << endl;*/
+
         }
     }
 
@@ -320,6 +414,7 @@ void search(Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
             }
                 
     }
+    TreeManipulator<T> tm;
 
     if (undefCount > 0) {
         cout << "UNDEFINED, NOTHING TO DO";
@@ -327,7 +422,26 @@ void search(Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
     else {
         cout << *minPair.a->element << "<->" << *minPair.b->element;
 
+        if ((minPair.localRoot->mark.msl + 1) / 2 == minPair.localRoot->mark.h) {
+            // delete localRoot
+            tm.removeElement(tree, *minPair.localRoot->element);
+        }
+        else
+        if ((minPair.localRoot->mark.msl - 1) % 2 == 0) {
+            int target = (minPair.localRoot->mark.msl + 1) / 2;
+
+            if (minPair.localRoot->hasLeft()) {
+                goForwardG(tree, minPair.localRoot->left, target);
+            }
+
+            if (minPair.localRoot->hasRight()) {
+                goForwardG(tree, minPair.localRoot->right, target);
+            }
+        }
+
     }
+
+    tm.goForwardPrint(tree.root);
 
 }
 
@@ -339,16 +453,13 @@ int main()
     Tree<int> tree;
     while (!(inputFile.peek() == EOF)) {
         inputFile >> tree;
-        elementAmount++;
     }
 
     outputFile.open("output.txt");
 
     goReverse(tree.root, tree.maxMSLLinks);
 
-    search(tree.root, tree.maxMSLLinks);
-
-    goForward(tree.root);
+    search(tree, tree.root, tree.maxMSLLinks);
 
     inputFile.close();
     outputFile.close();
