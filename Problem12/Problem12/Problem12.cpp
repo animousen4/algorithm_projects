@@ -232,6 +232,11 @@ void goForwardG(Node<T>* n, int& targetAmount) {
         if (n->mark.msl == targetAmount) {
             return;
         }
+
+        if (n->hasLeft() || n->hasRight()) {
+            // !!!!
+            n->getPriorityChild();
+        }
     }
 }
 
