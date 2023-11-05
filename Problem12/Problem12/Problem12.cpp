@@ -221,6 +221,7 @@ public:
     }
 
     void removeElement(Tree<T>& tree, T value) {
+        cout << "\nTARGET: " << value << endl;
         if (value == *tree.root->element) {
             if (tree.root->right != nullptr) {
                 if (tree.root->left == nullptr) {
@@ -242,6 +243,8 @@ public:
         }
         else
             removeElement(tree.root, nullptr, 0, value);
+
+        cout << "Remove finished. ";
     }
 
 };
@@ -330,10 +333,8 @@ void goForwardG(Tree<T>& tree, Node<T>* n, int& targetAmount) {
     
     if (n != nullptr) {
         if (n->mark.h == targetAmount) {
-            cout << "\nTARGET: " << *n->element << endl;
             TreeManipulator<T> tm;
             tm.removeElement(tree, *n->element);
-            cout << "Remove finished " << endl;
             return;
         }
 
@@ -353,7 +354,7 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
 
     Node<T>* node;
 
-    if (root->mark.h + 1 > maxMSLLinks[0]->mark.msl) {
+    if (root->mark.h + 1 >= maxMSLLinks[0]->mark.msl) {
         comparable.push_back(PointPair<T>{root, root->mark.m, root, root->mark.h + 1});
         if (!root->hasBoth())
             maxMSLLinks.erase(remove(maxMSLLinks.begin(), maxMSLLinks.end(), root), maxMSLLinks.end());
@@ -405,17 +406,19 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
 
         
             int target = (minPair.localRoot->mark.msl + 1) / 2;
-            int s = (minPair.a == minPair.localRoot || minPair.b == minPair.localRoot) 
-                ? minPair.localRoot->mark.msl + 1
-                : minPair.localRoot->mark.msl;
 
-            if (s % 2 != 0) {
-                if (minPair.localRoot->hasLeft()) {
-                    goForwardG(tree, minPair.localRoot->left, target);
+            if (minPair.wSize % 2 != 0) {
+                if (minPair.localRoot->mark.h == target) {
+                    tm.removeElement(tree, *minPair.localRoot->element);
                 }
+                else {
+                    if (minPair.localRoot->hasLeft()) {
+                        goForwardG(tree, minPair.localRoot->left, target);
+                    }
 
-                if (minPair.localRoot->hasRight()) {
-                    goForwardG(tree, minPair.localRoot->right, target);
+                    if (minPair.localRoot->hasRight()) {
+                        goForwardG(tree, minPair.localRoot->right, target);
+                    }
                 }
             }
        
