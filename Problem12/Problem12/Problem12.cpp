@@ -92,14 +92,19 @@ template<class T> struct PointPair
     Node<T>* b;
 
     Node<T>* localRoot;
-    //static PointPair& minRoot(PointPair& p1, PointPair& p2) {
-    //    
-    //}
+
+    int wSize = 0;
+
+
     T getSum() {
         return *a->element + *b->element;
     }
 
+    // !! look
     bool operator<(PointPair<T>& o2) {
+        /*if (wSize < o2.wSize) {
+            return true;
+        }*/
         return getSum() < o2.getSum();
     }
 
@@ -338,36 +343,29 @@ void goForwardG(Tree<T>& tree, Node<T>* n, int& targetAmount) {
 
 template<class T>
 void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
-
-    //cout << *root->mark.m->element << " " << *root->mark.mPrev->element;
-
-    /*if (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl) {
-        cout << *root->element << " <-> " << *root->mark.m->element;
-        return;
-    }  */
-
     
-    
+    vector<PointPair<T>> comparable;
     TreeManipulator<T> tm;
-    if (root->mark.msl + 1 > maxMSLLinks[0]->mark.msl) {
-        cout << *root->mark.m->element << " <-> " << *root->element;
-        int t = (root->mark.msl + 1) / 2;
 
-        goForwardG(tree, root->getPriorityChild(), t);
+    Node<T>* node;
 
-        return;
+    if (root->mark.h + 1 > maxMSLLinks[0]->mark.msl) {
+        comparable.push_back(PointPair<T>{root, root->mark.m, root, root->mark.h + 1});
+        if (!root->hasBoth())
+            maxMSLLinks.erase(remove(maxMSLLinks.begin(), maxMSLLinks.end(), root), maxMSLLinks.end());
+        
     }
 
-    vector<PointPair<T>> comparable;
-    Node<T>* node;
+    //
+
     for (int i = 0; i < maxMSLLinks.size(); i++) {
         node = maxMSLLinks[i];
         if (node->left->mark.m != nullptr && node->right->mark.mPrev != nullptr) {
-            comparable.push_back(PointPair<T> {node->left->mark.m, node->right->mark.mPrev, node});
+            comparable.push_back(PointPair<T> {node->left->mark.m, node->right->mark.mPrev, node, node->mark.msl});
         }
 
         if (node->left->mark.mPrev != nullptr && node->right->mark.m != nullptr) {
-            comparable.push_back(PointPair<T> {node->left->mark.mPrev, node->right->mark.m, node});
+            comparable.push_back(PointPair<T> {node->left->mark.mPrev, node->right->mark.m, node, node->mark.msl});
         }
     }
 
@@ -393,23 +391,6 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
                 }
             }
     }
-
-    if (root->mark.msl + 1 == minPair.localRoot->mark.msl) {
-        PointPair<T> rootPair{ root, root->mark.m, root };
-        if (rootPair < minPair) {
-            minPair = rootPair;
-            undefCount = 0;
-        }
-        else
-            if (rootPair == minPair) {
-                if (*rootPair.localRoot->element == *minPair.localRoot->element)
-                    undefCount++;
-                else if (*rootPair.localRoot->element < *minPair.localRoot->element) {
-                    minPair = rootPair;
-                }
-            }
-                
-    }
     
 
     if (undefCount > 0) {
@@ -420,13 +401,18 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
 
         
             int target = (minPair.localRoot->mark.msl + 1) / 2;
+            int s = (minPair.a == minPair.localRoot || minPair.b == minPair.localRoot) 
+                ? minPair.localRoot->mark.msl + 1
+                : minPair.localRoot->mark.msl;
 
-            if (minPair.localRoot->hasLeft()) {
-                goForwardG(tree, minPair.localRoot->left, target);
-            }
+            if (s % 2 != 0) {
+                if (minPair.localRoot->hasLeft()) {
+                    goForwardG(tree, minPair.localRoot->left, target);
+                }
 
-            if (minPair.localRoot->hasRight()) {
-                goForwardG(tree, minPair.localRoot->right, target);
+                if (minPair.localRoot->hasRight()) {
+                    goForwardG(tree, minPair.localRoot->right, target);
+                }
             }
        
 
