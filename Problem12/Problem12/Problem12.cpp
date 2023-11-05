@@ -100,15 +100,17 @@ struct PointPair {
         return *a->element + *b->element;
     }
 
+
     // !! look
     bool operator<(PointPair<T>& o2) {
-        if (wSize > o2.wSize)
+        /*if (wSize > o2.wSize)
             return true;
         else
-            if (wSize == o2.wSize)
-                return getSum() < o2.getSum();
+            if (wSize == o2.wSize)*/
+        
+        return getSum() < o2.getSum();
 
-        return false;
+        //return false;
        
     }
 
@@ -383,16 +385,19 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
     for (int i = 1; i < comparable.size(); i++) {
         cur = comparable[i];
 
-        if (cur < minPair) {
+        if (cur.wSize > minPair.wSize) {
             minPair = cur;
             undefCount = 0;
         }
         else
-            if (cur == minPair) {
-                if (*cur.localRoot->element == *minPair.localRoot->element )
-                    undefCount++;
-                else if (*cur.localRoot->element < *minPair.localRoot->element) {
-                    minPair = cur;
+            if (cur.wSize == minPair.wSize) {
+                if (cur == minPair) {
+                    if (*cur.localRoot->element == *minPair.localRoot->element)
+                        undefCount++;
+                    else if (*cur.localRoot->element < *minPair.localRoot->element) {
+                        minPair = cur;
+                        undefCount = 0;
+                    }
                 }
             }
     }
