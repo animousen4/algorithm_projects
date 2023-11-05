@@ -391,7 +391,11 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
         }
         else
             if (cur.wSize == minPair.wSize) {
-                if (cur == minPair) {
+                if (cur < minPair) {
+                    minPair = cur;
+                    undefCount = 0;
+                }
+                else if (cur == minPair) {
                     if (*cur.localRoot->element == *minPair.localRoot->element)
                         undefCount++;
                     else if (*cur.localRoot->element < *minPair.localRoot->element) {
@@ -399,6 +403,7 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
                         undefCount = 0;
                     }
                 }
+                
             }
     }
     
