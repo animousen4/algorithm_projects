@@ -86,8 +86,8 @@ struct Node {
     }
 
 };
-template<class T> struct PointPair
-{
+template<class T>
+struct PointPair {
     Node<T>* a;
     Node<T>* b;
 
@@ -102,14 +102,18 @@ template<class T> struct PointPair
 
     // !! look
     bool operator<(PointPair<T>& o2) {
-        /*if (wSize < o2.wSize) {
+        if (wSize > o2.wSize)
             return true;
-        }*/
-        return getSum() < o2.getSum();
+        else
+            if (wSize == o2.wSize)
+                return getSum() < o2.getSum();
+
+        return false;
+       
     }
 
     bool operator==(PointPair<T>& o2) {
-        return getSum() == o2.getSum();
+        return (wSize == o2.wSize) && (getSum() == o2.getSum());
     }
 };
 template<class T>
