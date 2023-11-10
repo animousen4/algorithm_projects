@@ -5,6 +5,45 @@
 #include <fstream>
 using namespace std;
 
+struct DSU {
+public:
+
+    DSU(int _n) {
+        n = _n;
+        parents = new int[n];
+        weights = new int[n];
+
+        initArray();
+    }
+
+    int findSet(int el) {
+        return parents[el];
+    }
+
+    void makeUnion(int a, int b) {
+        if (parents[a] != a && parents[b] != b) {
+            parents[b] = a;
+            weights[a]++;
+        } else 
+            if (parents[a] != a) {
+                parents[]
+            }
+    }
+    
+private:
+    int n;
+
+    int* parents;
+    int* weights;
+
+    void initArray() {
+        for (int i = 0; i < n; i++) {
+            parents[i] = i;
+            weights[i] = 1;
+        }
+    }
+};
+
 struct CityPair {
     int a;
     int b;
@@ -40,5 +79,7 @@ int main()
 
     inputFile.close();
 
-
+    for (int i = 0; i < q; i++) {
+        
+    }
 }
