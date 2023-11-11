@@ -13,25 +13,40 @@ public:
         parents = new int[n];
         weights = new int[n];
 
+        selfPointers = n;
+
         initArray();
     }
 
     int findSet(int el) {
-        return parents[el];
+        if (parents[el] == el)
+            return el;
+        else
+            findSet(parents[el]);
     }
 
     void makeUnion(int a, int b) {
-        if (parents[a] != a && parents[b] != b) {
-            parents[b] = a;
-            weights[a]++;
-        } else 
-            if (parents[a] != a) {
-                parents[]
-            }
+        int bSource = findSet(b);
+        int aSource = findSet(a);
+
+        if (aSource != bSource) {
+            selfPointers--;
+        }
+        
+        weights[aSource] += bSource;
+        parents[bSource] = aSource;
+
+        
+    }
+
+    int getSelfPointer() {
+        return selfPointers;
     }
     
 private:
     int n;
+
+    int selfPointers;
 
     int* parents;
     int* weights;
@@ -50,6 +65,8 @@ struct CityPair {
 
     friend istream& operator>>(istream& stream, CityPair& pair) {
         stream >> pair.a >> pair.b;
+        pair.a--;
+        pair.b--;
         return stream;
     }
 };
@@ -64,6 +81,7 @@ int main()
     int* destroyedRoads;
 
     ifstream inputFile("input.txt");
+    ofstream outputFile("output.txt");
     inputFile >> n >> m >> q;
 
     roads = new CityPair[m];
@@ -75,11 +93,32 @@ int main()
 
     for (int i = 0; i < q; i++) {
         inputFile >> destroyedRoads[i];
+        destroyedRoads[i]--;
     }
 
     inputFile.close();
 
-    for (int i = 0; i < q; i++) {
-        
+    DSU dsu(n);
+    int i;
+
+    string res = "";
+
+    for (i = q - 1; i >= 0; i--) {
+        dsu.makeUnion(roads[destroyedRoads[i]].a, roads[destroyedRoads[i]].b);
+
+        res += "0";
+
+        if (dsu.getSelfPointer() == 1)
+            break;
     }
+
+    for (; i > 0; i--) {
+        res.insert(0, "1");
+    }
+
+    outputFile << res;
+
+    outputFile.close();
+
+    return 0;
 }
