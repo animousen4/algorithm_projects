@@ -79,26 +79,38 @@ int main()
 
     CityPair* roads;
     int* destroyedRoads;
+    bool* staticRoad;
 
     ifstream inputFile("input.txt");
     ofstream outputFile("output.txt");
     inputFile >> n >> m >> q;
 
     roads = new CityPair[m];
+    staticRoad = new bool[m];
     destroyedRoads = new int[q];
 
     for (int i = 0; i < m; i++) {
         inputFile >> roads[i];
+        staticRoad[i] = true;
     }
 
     for (int i = 0; i < q; i++) {
         inputFile >> destroyedRoads[i];
         destroyedRoads[i]--;
+
+        staticRoad[destroyedRoads[i]] = false;
     }
 
     inputFile.close();
 
     DSU dsu(n);
+
+    for (int i = 0; i < m; i++) {
+        if (staticRoad[i]) {
+            dsu.makeUnion(roads[i].a, roads[i].b);
+        }
+    }
+
     int i;
 
     string res = "";
