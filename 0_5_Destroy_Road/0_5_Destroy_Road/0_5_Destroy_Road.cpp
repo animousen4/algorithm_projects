@@ -34,7 +34,6 @@ public:
         if (aSource != bSource) {
             selfPointers--;
 
-            //weights[aSource] += bSource;
             parents[bSource] = aSource;
         }
 
