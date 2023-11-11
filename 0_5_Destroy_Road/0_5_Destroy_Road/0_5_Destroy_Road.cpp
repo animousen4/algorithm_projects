@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 using namespace std;
 
 struct DSU {
@@ -11,7 +12,6 @@ public:
     DSU(int _n) {
         n = _n;
         parents = new int[n];
-        weights = new int[n];
 
         selfPointers = n;
 
@@ -21,8 +21,10 @@ public:
     int findSet(int el) {
         if (parents[el] == el)
             return el;
-        else
-            findSet(parents[el]);
+        else {
+            parents[el] = findSet(parents[el]);
+            return parents[el];
+        }
     }
 
     void makeUnion(int a, int b) {
@@ -31,10 +33,10 @@ public:
 
         if (aSource != bSource) {
             selfPointers--;
+
+            //weights[aSource] += bSource;
+            parents[bSource] = aSource;
         }
-        
-        weights[aSource] += bSource;
-        parents[bSource] = aSource;
 
         
     }
@@ -49,12 +51,10 @@ private:
     int selfPointers;
 
     int* parents;
-    int* weights;
 
     void initArray() {
         for (int i = 0; i < n; i++) {
             parents[i] = i;
-            weights[i] = 1;
         }
     }
 };
@@ -108,16 +108,19 @@ int main()
 
         res += "0";
 
-        if (dsu.getSelfPointer() == 1)
+        if (dsu.getSelfPointer() == 1) {
+            i--;
             break;
+
+        }
+        
     }
 
-    for (; i > 0; i--) {
+    for (; i >= 0; i--) {
         res.insert(0, "1");
     }
 
     outputFile << res;
-
     outputFile.close();
 
     return 0;
