@@ -114,16 +114,10 @@ int main()
 
     string res = "";
 
-    for (i = q - 1; i >= 0; i--) {
+    for (i = q - 1; i >= 0 && dsu.getSelfPointer() != 1; i--) {
         dsu.makeUnion(roads[destroyedRoads[i]].a, roads[destroyedRoads[i]].b);
 
         res += "0";
-
-        if (dsu.getSelfPointer() == 1) {
-            i--;
-            break;
-
-        }
         
     }
 
