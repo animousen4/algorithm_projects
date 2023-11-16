@@ -9,16 +9,16 @@ using namespace std;
 struct DSU {
 public:
 
-    DSU(int _n) {
+    DSU(long long _n) {
         n = _n;
-        parents = new int[n];
-
+        parents = new long long[n];
+        weights = new long long[n];
         selfPointers = n;
 
         initArray();
     }
 
-    int findSet(int el) {
+    long long findSet(long long el) {
         if (parents[el] == el)
             return el;
         else {
@@ -27,40 +27,50 @@ public:
         }
     }
 
-    void makeUnion(int a, int b) {
-        int bSource = findSet(b);
-        int aSource = findSet(a);
+    void makeUnion(long long a, long long b) {
+        long long bSource = findSet(b);
+        long long aSource = findSet(a);
 
         if (aSource != bSource) {
+            if (weights[aSource] > weights[bSource]) {
+                parents[bSource] = aSource;
+                weights[aSource] += weights[bSource];
+            }
+            else {
+                parents[aSource] = bSource;
+                weights[bSource] += weights[aSource];
+            }
+
             selfPointers--;
 
-            parents[bSource] = aSource;
         }
 
 
     }
 
-    int getSelfPointer() {
+    long long getSelfPointer() {
         return selfPointers;
     }
 
 private:
-    int n;
+    long long n;
 
-    int selfPointers;
+    long long selfPointers;
 
-    int* parents;
+    long long* weights;
+    long long* parents;
 
     void initArray() {
-        for (int i = 0; i < n; i++) {
+        for (long long i = 0; i < n; i++) {
             parents[i] = i;
+            weights[i] = 1;
         }
     }
 };
 
 struct CityPair {
-    int a;
-    int b;
+    long long a;
+    long long b;
 
     friend istream& operator>>(istream& stream, CityPair& pair) {
         stream >> pair.a >> pair.b;
@@ -72,8 +82,8 @@ struct CityPair {
 
 int main()
 {
-    int n;
-    int q;
+    long long n;
+    long long q;
 
 
     ifstream inputFile("input.txt");
@@ -85,7 +95,7 @@ int main()
 
     CityPair p;
 
-    for (int i = 0; i < q; i++) {
+    for (long long i = 0; i < q; i++) {
         inputFile >> p;
         dsu.makeUnion(p.a, p.b);
         outputFile << dsu.getSelfPointer() << endl;
