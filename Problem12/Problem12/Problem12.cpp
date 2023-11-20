@@ -349,6 +349,39 @@ void goForwardG(Tree<T>& tree, Node<T>* n, int& targetAmount) {
 }
 
 template<class T>
+Node<T>* goForwardGFindTarget(Tree<T>& tree, Node<T>* n, int& targetAmount) {
+
+    if (n != nullptr) {
+        if (n->mark.h == targetAmount) {
+            return n;
+        }
+
+        if (n->hasLeft() || n->hasRight()) {
+
+            auto c = n->getPriorityChild();
+            return goForwardGFindTarget(tree, c, targetAmount);
+        }
+    }
+}
+
+template<class T>
+Node<T>* getTargetElement(PointPair<T>& minPair, TreeManipulator<T>& tm, Tree<T>& tree) {
+    int target = (minPair.localRoot->mark.msl + 1) / 2;
+    
+    if (minPair.localRoot->mark.h == target) {
+        return minPair.localRoot;
+    }
+    else {
+        if (minPair.localRoot->hasLeft()) {
+            return goForwardGFindTarget(tree, minPair.localRoot->left, target);
+        }
+
+        if (minPair.localRoot->hasRight()) {
+            return goForwardGFindTarget(tree, minPair.localRoot->right, target);
+        }
+    }
+}
+template<class T>
 void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
     
     vector<PointPair<T>> comparable;
@@ -396,7 +429,7 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
                     undefCount = 0;
                 }
                 else if (cur == minPair) {
-                    if (*cur.localRoot->element == *minPair.localRoot->element)
+                    if (*cur.localRoot->element == *minPair.localRoot->element && *getTargetElement(cur, tm, tree)->element != *getTargetElement(minPair, tm, tree)->element)
                         undefCount++;
                     else if (*cur.localRoot->element < *minPair.localRoot->element) {
                         minPair = cur;
@@ -408,27 +441,24 @@ void search(Tree<T>& tree, Node<T>* root, vector<Node<T>*>& maxMSLLinks) {
     }
     
 
-    if (undefCount > 0) {
+    if (undefCount > 0 || minPair.wSize % 2 == 0) {
         cout << "UNDEFINED, NOTHING TO DO";
     }
     else {
         cout << *minPair.a->element << "<->" << *minPair.b->element;
 
-        
             int target = (minPair.localRoot->mark.msl + 1) / 2;
 
-            if (minPair.wSize % 2 != 0) {
-                if (minPair.localRoot->mark.h == target) {
-                    tm.removeElement(tree, *minPair.localRoot->element);
+            if (minPair.localRoot->mark.h == target) {
+                tm.removeElement(tree, *minPair.localRoot->element);
+            }
+            else {
+                if (minPair.localRoot->hasLeft()) {
+                    goForwardG(tree, minPair.localRoot->left, target);
                 }
-                else {
-                    if (minPair.localRoot->hasLeft()) {
-                        goForwardG(tree, minPair.localRoot->left, target);
-                    }
 
-                    if (minPair.localRoot->hasRight()) {
-                        goForwardG(tree, minPair.localRoot->right, target);
-                    }
+                if (minPair.localRoot->hasRight()) {
+                    goForwardG(tree, minPair.localRoot->right, target);
                 }
             }
        
