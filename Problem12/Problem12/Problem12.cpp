@@ -378,12 +378,13 @@ vector<Node<T>*> moveNext(Node<T>* node, T toFind) {
     vector<Node<T>*> newHv2 = moveNext(node->right, toFind);
     
     vector<Node<T>*> fres;
-    for (int i = 0; i < newHv1.size(); i++)
+
+    for (int i = newHv1.size() - 1 ; i >= 0; i--)
         fres.push_back(newHv1[i]);
-    fres.push_back(node);
-    for (int i = 0; i < newHv2.size(); i++)
+    if (newHv1.size() > 0 || newHv2.size() > 0)
+        fres.push_back(node);
+    for (int i = newHv2.size() - 1; i >= 0; i--)
         fres.push_back(newHv2[i]);
-    
     return fres;
 }
 template<class T>
