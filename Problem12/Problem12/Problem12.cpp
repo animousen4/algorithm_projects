@@ -491,10 +491,13 @@ int main()
 
     outputFile.open("output.txt");
 
-    goReverse(tree.root, tree.maxMSLLinks);
+    if (tree.root->left == nullptr && tree.root->right == nullptr)
+        outputFile << *tree.root->element;
+    else {
+        goReverse(tree.root, tree.maxMSLLinks);
 
-    search(tree, tree.root, tree.maxMSLLinks);
-
+        search(tree, tree.root, tree.maxMSLLinks);
+    }
     inputFile.close();
     outputFile.close();
 }
