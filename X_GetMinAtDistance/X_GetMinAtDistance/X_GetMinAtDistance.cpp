@@ -2,26 +2,55 @@
 //
 
 #include <iostream>
+#include <fstream>
 using namespace std;
 
-int getMinAtArray(int* p, int l, int r) {
-    int min = p[l];
-    for (int i = l + 1; i < r; i++)
-        if (p[i] < min)
-            min = p[i];
+struct BlockStruct {
+    int* pBlocks;
+    int* p;
+    int blockSize;
+    int blockAmount;
 
-    return min;
-}
+    BlockStruct(int* p, int n) {
+        this->p = p;
+        pBlocks = new int[n];
+        blockSize = sqrt(n);
+        blockAmount = ceil(n / (double)blockSize);
+    }
 
-void modifyMin() {
+    int getMinAtArray(int l, int r) {
+        int min = p[l];
+        for (int i = l + 1; i < r; i++)
+            if (p[i] < min)
+                min = p[i];
 
-}
+        return min;
+    }
+
+    void modifyMin(int modifyIndex, int newValue) {
+        int blockIndex = modifyIndex / blockSize;
+        p[modifyIndex] = newValue;
+        if (pBlocks[blockIndex] > newValue) {
+            //for (int i =)
+        }
+    }
+
+};
 int main()
 {
-    int* arr = new int[3];
-    arr[0] = 4;
-    arr[1] = 3;
-    arr[2] = 2;
+    ifstream inputFile("input.txt");
+    int n;
 
-    cout << getMinAtArray(arr, 0, 2);
+    inputFile >> n;
+
+    int* arr = new int[n];
+
+    for (int i = 0; i < n; i++)
+        inputFile >> arr[i];
+
+    inputFile.close();
+
+    BlockStruct bs(arr, n);
+
+    cout << bs.getMinAtArray(0, 2);
 }
