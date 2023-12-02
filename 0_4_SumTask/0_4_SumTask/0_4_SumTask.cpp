@@ -40,19 +40,19 @@ int main()
         scanf_s("%lld", &numbers[i]);
     }
 
-    int k = sqrt(n);
+    int blocSize = sqrt(n);
 
-    blocsAmount = ceil(n / (double)k);
+    blocsAmount = ceil(n / (double)blocSize);
     presumBlocs = new long long[blocsAmount];
     for (int i = 0; i < blocsAmount - 1; i++) {
         presumBlocs[i] = 0;
-        for (int j = i*k; j < (i+1)*k; j++)
+        for (int j = i*blocSize; j < (i+1)*blocSize; j++)
             presumBlocs[i] += numbers[j];
     }
 
     
     presumBlocs[blocsAmount - 1] = 0;
-    for (int i = (blocsAmount - 1) * k; i < n; i++)
+    for (int i = (blocsAmount - 1) * blocSize; i < n; i++)
         presumBlocs[blocsAmount - 1] += numbers[i];
 
     scanf_s("%d", &commandsAmount);
@@ -68,15 +68,15 @@ int main()
         if (command == "FindSum") {
             sum = 0;
 
-            int leftBorderBloc = arg1 / k;
-            int rightBorderBlock = arg2 / k;
+            int leftBorderBloc = arg1 / blocSize;
+            int rightBorderBlock = arg2 / blocSize;
 
             if (leftBorderBloc == rightBorderBlock)
                 sum = getSumInArray(numbers, arg1, arg2);
             else {
-                sum += getSumInArray(numbers, arg1, (leftBorderBloc + 1) * k);
+                sum += getSumInArray(numbers, arg1, (leftBorderBloc + 1) * blocSize);
                 sum += getSumInArray(presumBlocs, (leftBorderBloc + 1), rightBorderBlock);
-                sum += getSumInArray(numbers, rightBorderBlock * k, arg2);
+                sum += getSumInArray(numbers, rightBorderBlock * blocSize, arg2);
             }
 
             res[resSize] = sum;
@@ -86,7 +86,7 @@ int main()
         else {
 
             numbers[arg1] += arg2;
-            presumBlocs[arg1 / k] += arg2;
+            presumBlocs[arg1 / blocSize] += arg2;
         }
     }
 
