@@ -7,37 +7,88 @@
 #include <algorithm>
 #include <math.h>
 using namespace std;
-int blockSize;
-int blocksAmount;
-int* pBlocks;
 
-int getMinInArray(int* arr, int l, int r) {
-    int min = arr[l];
-    for (int i = l + 1; i < r; i++)
-        min = arr[i];
-    return min;
-}
+struct BlockStruct {
+    int* pBlocks;
+    int* p;
+    int n;
+    int blockSize;
+    int blockAmount;
+
+    BlockStruct(int* p, int n) {
+        this->p = p;
+        this->n = n;
+        blockSize = sqrt(n);
+        blockAmount = ceil(n / (double)blockSize);
+        pBlocks = new int[blockAmount];
+
+        for (int i = 0; i < blockAmount; i++)
+            pBlocks[i] = INT_MAX;
+        
+
+    }
+
+    int getMin(int l, int r) {
+        int blockLeft = l / blockSize;
+        int blockRight = r / blockSize;
+
+        int min;
+        if (blockLeft == blockRight)
+            min = getMinAtArray(p, l, r);
+        else {
+            int min1 = getMinAtArray(p, l, (blockLeft + 1) * blockSize);
+            int min2 = getMinAtArray(pBlocks, (blockLeft + 1), blockRight);
+            int min3 = blockRight * blockSize == r ? INT_MAX : getMinAtArray(p, blockRight * blockSize, r);
+
+            min = min1;
+
+            if (min2 < min)
+                min = min2;
+            if (min3 < min)
+                min = min3;
+        }
+
+        return min;
+    }
+    void modifyMin(int modifyIndex, int newValue) {
+        int blockIndex = modifyIndex / blockSize;
+        p[modifyIndex] = newValue;
+
+        int min;
+        if (blockIndex == blockAmount - 1) {
+            min = p[(blockAmount - 1) * blockSize];
+            for (int i = (blockAmount - 1) * blockSize + 1; i < n; i++)
+                if (min > p[i])
+                    min = p[i];
+        }
+        else {
+            min = p[blockIndex * blockSize];
+            for (int i = blockIndex * blockSize + 1; i < (blockIndex + 1) * blockSize; i++)
+                if (min > p[i])
+                    min = p[i];
+        }
+        pBlocks[blockIndex] = min;
+
+    }
+
+private:
+    int getMinAtArray(int* p, int l, int r) {
+        int min = p[l];
+        for (int i = l + 1; i < r; i++)
+            if (p[i] < min)
+                min = p[i];
+
+        return min;
+    }
+
+};
 
 int getMin(int* p, int from, int to) {
+    int min = p[from];
+    for (int i = from + 1; i < to; i++)
+        if (min > p[i])
+            min = p[i];
 
-    int min;
-    int leftBorderBlock = from / blockSize;
-    int rightBorderBlock = to / blockSize;
-
-    if (leftBorderBlock == rightBorderBlock)
-        min = getMinInArray(p, from, to);
-    else {
-        int min1 = getMinInArray(p, from, (leftBorderBlock + 1) * blockSize);
-        int min2 = getMinInArray(pBlocks, (leftBorderBlock + 1), rightBorderBlock);
-        int min3 = getMinInArray(p, rightBorderBlock * blockSize, to);
-
-        min = min1;
-
-        if (min2 < min)
-            min = min2;
-        if (min3 < min)
-            min = min3;
-    }
     return min;
 }
 int main()
@@ -68,25 +119,25 @@ int main()
         p[i] = INT_MAX;
     } 
 
-    blockSize = sqrt(n);
-    blocksAmount = ceil(n / (double)blockSize);
-    pBlocks = new int[blocksAmount];
-
-    for (int i = 0; i < blocksAmount; i++)
-        pBlocks[i] = INT_MAX;
+    BlockStruct bs(p, n);
 
     int c = n;
     for (int i = 0; i < n; i++) {
-        int min = getMin(p, 0, participants[i][1] + 1);
+        //int min = getMin(p, 0, participants[i][1] + 1);
+        int min = bs.getMin(0, participants[i][1] + 1);
         if (min > participants[i][2]) {
             int placeIn2 = participants[i][1];
             int placeIn3 = participants[i][2];
-            p[placeIn2] = placeIn3;
-            if (pBlocks[placeIn2 / blockSize] > p[])
-            //pBlocks[placeIn2 / blockSize
+
+            //p[placeIn2] = placeIn3;
+            bs.modifyMin(placeIn2, placeIn3);
         }
         else 
             c--;
+
+        for (int j = 0; j < n; j++)
+            cout << p[j] << "\t";
+        cout << endl;
     }
 
     cout << c;
