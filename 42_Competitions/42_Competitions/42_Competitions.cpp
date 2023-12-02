@@ -60,20 +60,8 @@ struct BlockStruct {
         int blockIndex = modifyIndex / blockSize;
         p[modifyIndex] = newValue;
 
-        int min;
-        if (blockIndex == blockAmount - 1) {
-            min = p[(blockAmount - 1) * blockSize];
-            for (int i = (blockAmount - 1) * blockSize + 1; i < n; i++)
-                if (min > p[i])
-                    min = p[i];
-        }
-        else {
-            min = p[blockIndex * blockSize];
-            for (int i = blockIndex * blockSize + 1; i < (blockIndex + 1) * blockSize; i++)
-                if (min > p[i])
-                    min = p[i];
-        }
-        pBlocks[blockIndex] = min;
+        if (newValue < pBlocks[blockIndex])
+            pBlocks[blockIndex] = newValue;
 
     }
 
@@ -124,6 +112,8 @@ int main()
         if (min > participants[i][2]) {
             int placeIn2 = participants[i][1];
             int placeIn3 = participants[i][2];
+
+            
             bs.modifyMin(placeIn2, placeIn3);
         }
         else 
