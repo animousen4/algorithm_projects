@@ -33,13 +33,18 @@ struct BlockStruct {
         int blockRight = r / blockSize;
 
         int min;
+
+        int min1;
+        int min2;
+        int min3;
+
         if (blockLeft == blockRight)
             min = getMinAtArray(p, l, r);
         else {
 
-            int min1 = getMinAtArray(p, l, (blockLeft + 1) * blockSize);
-            int min2 = getMinAtArray(pBlocks, (blockLeft + 1), blockRight);
-            int min3 = getMinAtArray(p, blockRight * blockSize, r);
+            min1 = getMinAtArray(p, l, (blockLeft + 1) * blockSize);
+            min2 = getMinAtArray(pBlocks, (blockLeft + 1), blockRight);
+            min3 = getMinAtArray(p, blockRight * blockSize, r);
 
             min = min1;
 
@@ -83,15 +88,6 @@ private:
     }
 
 };
-
-int getMin(int* p, int from, int to) {
-    int min = p[from];
-    for (int i = from + 1; i < to; i++)
-        if (min > p[i])
-            min = p[i];
-
-    return min;
-}
 int main()
 {   
 
