@@ -118,10 +118,6 @@ int main()
         }
         else 
             c--;
-
-        for (int j = 0; j < n; j++)
-            cout << p[j] << "\t";
-        cout << endl;
     }
 
     cout << c;
