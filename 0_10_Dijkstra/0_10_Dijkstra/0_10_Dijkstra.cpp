@@ -58,11 +58,12 @@ int main()
         pq.pop();
 
         if (!p[v.el]) {
+            
             p[v.el] = true;
             d[v.el] = v.prior;
 
             for (int i = 1; i <= m; i++) {
-                if (!p[arr[i][1]])
+                if (!p[arr[i][1]] && (v.prior + arr[i][2] < d[arr[i][1]]))
                     pq.push({ arr[i][1], arr[i][2] + v.prior });
             }
         }
