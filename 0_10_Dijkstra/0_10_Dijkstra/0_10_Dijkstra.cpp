@@ -7,15 +7,20 @@
 using namespace std;
 
 struct Element {
-    int el;
-    int prior;
-};
 
+    Element(long long x, long long y) {
+        el = x;
+        prior = y;
+    }
+
+    long long el;
+    long long prior;
+};
 
 class PComparator {
 public:
     bool operator() (const Element& a, const Element& b) const {
-        return a.prior < b.prior;
+        return a.prior > b.prior;
     }
 };
 
@@ -23,8 +28,7 @@ int main()
 {   
     int n;
     int m;
-    int** arr;
-    int* d;
+    long long* d;
     bool* p;
     priority_queue<Element, vector<Element>, PComparator> pq;
     ifstream inputFile("input.txt");
@@ -34,37 +38,51 @@ int main()
     int start = 1;
     int end = n;
 
-    arr = new int*[m + 1];
-    d = new int[n + 1];
+    d = new long long[n + 1];
     p = new bool[n + 1];
 
     for (int i = 1; i <= n; i++) {
-        d[i] = INT_MAX;
+        d[i] = LLONG_MAX;
         p[i] = false;
+    }
+    vector<vector<Element>> matrix(n + 1);
+
+    int a, b, w;
+
+    for (int i = 1; i <= m; i++) {
+        inputFile >> a >> b >> w;
+
+        Element newNeighbour(b, w);
+
+        matrix[a].push_back(newNeighbour);
+
+        newNeighbour.el = a;
+
+        matrix[b].push_back(newNeighbour);
     }
 
     d[start] = 0;
-
     pq.push({start, 0});
-    for (int i = 1; i <= m; i++) {
-        arr[i] = new int[3];
-
-        inputFile >> arr[i][0] >> arr[i][1] >> arr[i][2];
-    }
-
 
     while (!pq.empty()) {
         auto v = pq.top();
         pq.pop();
 
+        long long curV = v.el;
+        long long curD = v.prior;
+
         if (!p[v.el]) {
             
-            p[v.el] = true;
-            d[v.el] = v.prior;
+            p[curV] = true;
+            d[curV] = curD;
 
-            for (int i = 1; i <= m; i++) {
-                if (!p[arr[i][1]] && (v.prior + arr[i][2] < d[arr[i][1]]))
-                    pq.push({ arr[i][1], arr[i][2] + v.prior });
+            for (int i = 0; i < matrix[v.el].size(); i++) {
+
+                long long nextNeighbour = matrix[v.el][i].el;
+                long long nextNeighbourDist = matrix[v.el][i].prior;
+
+                if (!p[nextNeighbour] && (curD + nextNeighbourDist < d[nextNeighbour]))
+                    pq.push({ nextNeighbour,  curD + nextNeighbourDist });
             }
         }
     }
