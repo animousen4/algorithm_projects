@@ -4,9 +4,10 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-
+#include <algorithm>
 using namespace std;
 struct Mark {
+    int v = -1;
     int f = -1;
     int s = -1;
     bool dS = false;
@@ -73,9 +74,6 @@ int main()
 {
     int n;
     
-    
-
-
     ifstream inputFile("input.txt");
 
     inputFile >> n;
@@ -110,15 +108,89 @@ int main()
             dfs1(i, listSm);
         }
 
+    vector<Mark> sortedMarks(n);
+    for (int i = 0; i < n; i++) {
+        sortedMarks[i] = marks[i];
+        sortedMarks[i].v = i;
+    }
+
+    std::sort(sortedMarks.begin(), sortedMarks.end(), [](Mark& s1, Mark& s2) {
+        return s1.s > s2.s;
+    });
+
+
+    cout << endl;
     vector<int> vv;
+    vector<int> components;
+    int minTerminalAmount;
+    int minTerminalIndex;
     for (int i = 0; i < n; i++)
-        if (!marks[i].dS) {
+        if (!marks[sortedMarks[i].v].dS) {
             vv.clear();
-            dfs2(i, reverseListSm, vv);
+            dfs2(sortedMarks[i].v, reverseListSm, vv);
+
+            minTerminalAmount = INT_MAX;
+            for (auto versh : vv) {
+                if (minTerminalAmount > terminal[versh]) {
+                    minTerminalIndex = versh;
+                    minTerminalAmount = terminal[versh];
+                }
+            }
+
+            components.push_back(minTerminalIndex);
+
             for (auto versh : vv)
                 cout << versh + 1 << "\t";
             cout << endl;
         }
+
+    cout << endl << endl;
+    for (int i = 0; i < components.size(); i++)
+        cout << components[i] + 1 << " ";
+
+
+    //int** cMatrix = new int*[components.size()];
+    int* meow = new int[components.size()];
+    for (int i = 0; i < components.size(); i++)
+        meow[i] = 0;
+
+    cout << endl;
+    int finalSize = 0;
+    for (int i = 0; i < components.size(); i++) {
+        //cMatrix[i] = new int[components.size()];
+        for (int j = 0; j < components.size(); j++) {
+
+            if (std::find(listSm[components[i]].begin(), listSm[components[i]].end(), components[j]) != listSm[components[i]].end()) {
+                //cMatrix[i][j] = 1;
+                finalSize++;
+                meow[j] = 1;
+            }
+            /*else {
+                cMatrix[i][j] = 0;
+            }*/
+        }
+    }
+    /*for (int i = 0; i < components.size(); i++) {
+        for (int j = 0; j < components.size(); j++) {
+            cout << cMatrix[i][j] << " ";
+        }
+        cout << endl;
+    }*/
+
+    cout << endl;
+
+    ofstream outputFile("output.txt");
+
+    outputFile << finalSize << endl;
+
+
+    for (int i = 0; i < components.size(); i++)
+        if (!meow[i])
+            outputFile << components[i] + 1 << " ";
+
+    outputFile.close();
+
+
    /* for (int i = 0; i < n; i++) {
         cout << i + 1 << "\t";
     }
