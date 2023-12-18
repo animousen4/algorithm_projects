@@ -78,6 +78,7 @@ int main()
 
     inputFile >> n;
     vector<int> terminal(n);
+    vector<int> vParent(n);
     vector<vector<int>> listSm(n);
     vector<vector<int>> reverseListSm(n);
     marks = new Mark[n];
@@ -97,11 +98,6 @@ int main()
 
     inputFile.close();
 
-    /*bool haveCondensation = true;
-
-    while (haveCondensation) {
-        
-    }*/
 
     for (int i = 0; i < n; i++)
         if (!marks[i].isGray()) {
@@ -122,8 +118,10 @@ int main()
     cout << endl;
     vector<int> vv;
     vector<int> components;
+    vector<vector<int>> componentsContainer;
     int minTerminalAmount;
     int minTerminalIndex;
+    int curComp = 0;
     for (int i = 0; i < n; i++)
         if (!marks[sortedMarks[i].v].dS) {
             vv.clear();
@@ -135,74 +133,39 @@ int main()
                     minTerminalIndex = versh;
                     minTerminalAmount = terminal[versh];
                 }
+                vParent[versh] = curComp;
             }
-
+            
+            curComp++;
             components.push_back(minTerminalIndex);
-
-            for (auto versh : vv)
-                cout << versh + 1 << "\t";
-            cout << endl;
+            componentsContainer.push_back(vv);
         }
-
-    cout << endl << endl;
-    for (int i = 0; i < components.size(); i++)
-        cout << components[i] + 1 << " ";
-
-
-    //int** cMatrix = new int*[components.size()];
-    int* meow = new int[components.size()];
-    for (int i = 0; i < components.size(); i++)
-        meow[i] = 0;
-
-    cout << endl;
-    int finalSize = 0;
-    for (int i = 0; i < components.size(); i++) {
-        //cMatrix[i] = new int[components.size()];
-        for (int j = 0; j < components.size(); j++) {
-
-            if (std::find(listSm[components[i]].begin(), listSm[components[i]].end(), components[j]) != listSm[components[i]].end()) {
-                //cMatrix[i][j] = 1;
-                finalSize++;
-                meow[j] = 1;
+    vector<vector<int>> nGraphSp(components.size());
+    vector<int> inDougs(components.size());
+    int amountC = components.size();
+    for (int i = 0; i < componentsContainer.size(); i++) {
+        for (int j = 0; j < componentsContainer[i].size(); j++) {
+            for (int mm = 0; mm < listSm[componentsContainer[i][j]].size(); mm++) {
+                if (vParent[listSm[componentsContainer[i][j]][mm]] != vParent[componentsContainer[i][j]]) {
+                    if (!inDougs[vParent[listSm[componentsContainer[i][j]][mm]]]) {
+                        inDougs[vParent[listSm[componentsContainer[i][j]][mm]]] = true;
+                        amountC--;
+                    }
+                }
             }
-            /*else {
-                cMatrix[i][j] = 0;
-            }*/
+            //cout << componentsContainer[i][j] + 1 << " ";
         }
+            
+        //cout << endl;
     }
-    /*for (int i = 0; i < components.size(); i++) {
-        for (int j = 0; j < components.size(); j++) {
-            cout << cMatrix[i][j] << " ";
-        }
-        cout << endl;
-    }*/
-
-    cout << endl;
 
     ofstream outputFile("output.txt");
-
-    outputFile << finalSize << endl;
-
-
-    for (int i = 0; i < components.size(); i++)
-        if (!meow[i])
+    outputFile << amountC << endl;
+    for (int i = 0; i < components.size(); i++) {
+        if (!inDougs[i])
             outputFile << components[i] + 1 << " ";
+    }
 
     outputFile.close();
-
-
-   /* for (int i = 0; i < n; i++) {
-        cout << i + 1 << "\t";
-    }
-    cout << endl;
-    for (int i = 0; i < n; i++) {
-        cout << marks[i].f << "\t";
-    }
-    cout << endl;
-    for (int i = 0; i < n; i++) {
-        cout << marks[i].s << "\t";
-    }*/
-    
-        
 
 }

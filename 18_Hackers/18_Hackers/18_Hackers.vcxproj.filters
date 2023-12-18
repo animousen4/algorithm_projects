@@ -20,7 +20,8 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="input.txt" />
+    <Text Include="input2.txt" />
     <Text Include="output.txt" />
+    <Text Include="input.txt" />
   </ItemGroup>
 </Project>
