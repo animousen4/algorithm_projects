@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="43_2_haffman.cpp">
+    <ClCompile Include="43_2_2_haffman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
