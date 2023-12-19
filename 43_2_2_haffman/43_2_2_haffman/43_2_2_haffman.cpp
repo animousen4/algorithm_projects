@@ -3,92 +3,99 @@
 
 #include <iostream>
 #include <fstream>
+
+
+
 using namespace std;
 
 int main()
 {
+    const long long avgMax = 1e18;
     long long res = 0;
-    long long* inArr;
-    long long* extraArr;
+    long long* firstArr;
+    long long* secondArr;
     int pointerFirst = 0;
     int pointerSecond = 0;
     int secondSize = 0;
-    int n;
+    int firstSize;
     int leftElements;
     ifstream inputFile("huffman.in");
 
-    inputFile >> n;
-    leftElements = n - 1;
-    inArr = new long long[n];
-    extraArr = new long long[n];
-    for (int i = 0; i < n; i++) {
-        inputFile >> inArr[i];
-        extraArr[i] = LONG_MIN;
+    inputFile >> firstSize;
+    leftElements = firstSize - 1;
+    firstArr = new long long[firstSize + 7];
+    secondArr = new long long[firstSize + 7];
+
+    for (int i = firstSize; i < firstSize + 7; i++) {
+        firstArr[i] = avgMax;
+        secondArr[i] = avgMax;
+    }
+    for (int i = 0; i < firstSize; i++) {
+        inputFile >> firstArr[i];
+        secondArr[i] = avgMax;
     }
 
     inputFile.close();
 
-    pointerFirst += 2;
-    secondSize += 1;
+    secondArr[0] = firstArr[0] + firstArr[1];
+
+    pointerFirst = 2;
+    pointerSecond = 0;
+    secondSize = 1;
     
-    extraArr[0] = inArr[0] + inArr[1];
 
     long long s1;
     long long s2;
     long long s3;
-    long long totalSum = extraArr[0];
-    long long min;
+    long long totalSum = 0;
+    long long minElement;
     int operType = 0;
-    while (leftElements != 1) {
-        s1 = LONG_MAX;
-        s2 = LONG_MAX;
-        s3 = LONG_MAX;
+    while (true) {
 
+        s1 = firstArr[pointerFirst] + firstArr[pointerFirst + 1];
 
-        if (pointerFirst + 1 < n)
-            s1 = inArr[pointerFirst] + inArr[pointerFirst + 1];
-        if (pointerSecond < secondSize && pointerFirst < n)
-            s2 = extraArr[pointerSecond] + inArr[pointerFirst];
-        if (pointerSecond + 1 < secondSize)
-            s3 = extraArr[pointerSecond] + extraArr[pointerSecond + 1];
+        s2 = secondArr[pointerSecond] + firstArr[pointerFirst];
+        
+        s3 = secondArr[pointerSecond] + secondArr[pointerSecond + 1];
         
 
-        min = s1;
+        minElement = s1;
         operType = 1;
 
-        if (s2 < min) {
+        if (s2 < minElement) {
             operType = 2;
-            min = s2;
+            minElement = s2;
         }
 
-        if (s3 < min) {
+        if (s3 < minElement) {
             operType = 3;
-            min = s3;
+            minElement = s3;
         }
+
+        if (minElement > avgMax)
+            break;
 
         if (operType == 1) {
             pointerFirst += 2;
-            extraArr[secondSize] = min;
-            secondSize++;
         }
+
         else
             if (operType == 2) {
                 pointerFirst++;
                 pointerSecond++;
-                extraArr[secondSize] = min;
-                secondSize++;
             }
                 else {
                     pointerSecond += 2;
-                    extraArr[secondSize] = min;
-                    secondSize++;
-                
                 }
 
-        totalSum += min;
-        leftElements--;
+        secondArr[secondSize] = minElement;
+        secondSize++;
 
     }
+
+
+    for (int i = 0; i < secondSize; i++)
+        totalSum += secondArr[i];
 
     ofstream outputFile("huffman.out");
 
